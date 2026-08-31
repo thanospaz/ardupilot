@@ -64,6 +64,7 @@ void Copter::init_ardupilot()
     allocate_motors();
 
     // initialise rc channels including setting mode
+    // PARAMETER_CONVERSION - Added: Sep-2021 for Copter-4.2
     rc().convert_options(RC_Channel::AUX_FUNC::ARMDISARM_UNUSED, RC_Channel::AUX_FUNC::ARMDISARM_AIRMODE);
     rc().init();
 
@@ -145,11 +146,6 @@ void Copter::init_ardupilot()
 #if HAL_PROXIMITY_ENABLED
     // init proximity sensor
     g2.proximity.init();
-#endif
-
-#if AP_BEACON_ENABLED
-    // init beacons used for non-gps position estimation
-    g2.beacon.init();
 #endif
 
 #if MODE_AUTO_ENABLED

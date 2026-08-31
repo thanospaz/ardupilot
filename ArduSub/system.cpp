@@ -48,6 +48,7 @@ void Sub::init_ardupilot()
     gcs().setup_uarts();
 
     // initialise rc channels including setting mode
+    // PARAMETER_CONVERSION - Added: Sep-2021 for ArduSub-4.5
     rc().convert_options(RC_Channel::AUX_FUNC::ARMDISARM_UNUSED, RC_Channel::AUX_FUNC::ARMDISARM);
     rc().init();
 
@@ -154,6 +155,14 @@ void Sub::init_ardupilot()
     mainloop_failsafe_enable();
 
     ins.set_log_raw_bit(MASK_LOG_IMU_RAW);
+
+    // PARAMETER_CONVERSION - Added: Mar-2026
+    if (g2.param_conversion_increment < 1) {
+        update_actuators_from_jsbuttons();
+        update_lights_from_rcin();
+        g2.param_conversion_increment.set_and_save(1);
+    }
+
     g2.actuators.initialize_actuators();
 
 #if LEAKDETECTOR_MAX_INSTANCES > 0

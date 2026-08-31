@@ -466,7 +466,7 @@ void AP_Mount::handle_gimbal_manager_set_attitude(const mavlink_message_t &msg)
     const Vector3f att_rate_degs {
         packet.angular_velocity_x,
         packet.angular_velocity_y,
-        packet.angular_velocity_y
+        packet.angular_velocity_z
     };
 
     // ensure that we are only demanded to a specific attitude or to
@@ -770,6 +770,17 @@ void AP_Mount::set_attitude_euler(uint8_t instance, float roll_deg, float pitch_
     backend->set_attitude_euler(roll_deg, pitch_deg, yaw_bf_deg);
 }
 
+#if AP_SCRIPTING_ENABLED
+void AP_Mount::set_natively_supported_mount_target_types(uint8_t instance, uint8_t types_mask)
+{
+    auto *backend = get_instance(instance);
+    if (backend == nullptr) {
+        return;
+    }
+    backend->set_natively_supported_mount_target_types(types_mask);
+}
+#endif  // AP_SCRIPTING_ENABLED
+
 #if HAL_LOGGING_ENABLED
 // write mount log packet for all backends
 void AP_Mount::write_log()
@@ -822,6 +833,17 @@ void AP_Mount::clear_roi_target(uint8_t instance)
     }
     backend->clear_roi_target();
 }
+
+#if AP_MOUNT_ROI_WPNEXT_OFFSET_ENABLED
+void AP_Mount::set_roi_target_wpnext_offset(uint8_t instance, const Vector3f &rpy)
+{
+    auto *backend = get_instance(instance);
+    if (backend == nullptr) {
+        return;
+    }
+    backend->set_roi_target_wpnext_offset(rpy);
+}
+#endif  // AP_MOUNT_ROI_WPNEXT_OFFSET_ENABLED
 
 //
 // camera controls for gimbals that include a camera
@@ -1081,7 +1103,7 @@ void AP_Mount::convert_params()
         return;
     }
 
-    // below conversions added Sep 2022 ahead of 4.3 release
+    // PARAMETER_CONVERSION - Added: Sep-2022 for ArduPilot-4.3
 
     // convert MNT_TYPE to MNT1_TYPE
     int8_t mnt_type = 0;

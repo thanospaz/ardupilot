@@ -17,6 +17,7 @@
 */
 
 #include "SIM_config.h"
+#include <AP_Common/AP_Common.h>
 
 #if AP_SIM_TOPOTEK_ENABLED
 
@@ -143,8 +144,8 @@ void Topotek::update_input()
         }
 
         // parse data length from ASCII hex char at [5]
-        const uint8_t data_len = char_to_hex(_buf[5]);
-        if (data_len == 255) {
+        uint8_t data_len;
+        if (!hex_char_to_nibble(_buf[5], data_len)) {
             // invalid data length — discard '#'
             move_preamble_in_buffer(1);
             continue;
@@ -178,6 +179,10 @@ void Topotek::handle_packet(uint8_t data_len)
         return;
     }
 
+    // byte [3] is the source address of the sender; replies (including
+    // the attitude stream) are sent to that address from now on
+    _reply_address = _buf[3];
+
     // ID is at bytes [7..9]
     const char *id = (const char*)&_buf[7];
 
@@ -207,19 +212,17 @@ void Topotek::handle_packet(uint8_t data_len)
     } else if (strncmp(id, "GIP", 3) == 0 && data_len >= 4) {
         // pitch angle command: data[0..3] = 4 uppercase hex chars for int16 centidegrees
         // Wire value is (uint16_t)(-degrees(pitch_rad)*100); store as-is for echo in send_attitude()
-        _commanded_pitch_cd = (int16_t)(
-            ((uint16_t)char_to_hex(_buf[10]) << 12) |
-            ((uint16_t)char_to_hex(_buf[11]) <<  8) |
-            ((uint16_t)char_to_hex(_buf[12]) <<  4) |
-             (uint16_t)char_to_hex(_buf[13]));
+        uint32_t tmp;
+        if (hex_chars_to_uint32((const char*)&_buf[10], 4, tmp)) {
+            _commanded_pitch_cd = (int16_t)tmp;
+        }
 
     } else if (strncmp(id, "GIY", 3) == 0 && data_len >= 4) {
         // body-frame yaw angle command
-        _commanded_yaw_cd = (int16_t)(
-            ((uint16_t)char_to_hex(_buf[10]) << 12) |
-            ((uint16_t)char_to_hex(_buf[11]) <<  8) |
-            ((uint16_t)char_to_hex(_buf[12]) <<  4) |
-             (uint16_t)char_to_hex(_buf[13]));
+        uint32_t tmp;
+        if (hex_chars_to_uint32((const char*)&_buf[10], 4, tmp)) {
+            _commanded_yaw_cd = (int16_t)tmp;
+        }
     }
     // all other commands (YPR, GIR, PTZ, LAT, LON, ALT, etc.) absorbed silently
 }
@@ -237,7 +240,7 @@ void Topotek::send_packet(char addr2, const char id[3], bool write, const uint8_
     pkt[ofs++] = '#';
     pkt[ofs++] = 'T';
     pkt[ofs++] = 'P';
-    pkt[ofs++] = 'U';
+    pkt[ofs++] = _reply_address;
     pkt[ofs++] = (uint8_t)addr2;
     pkt[ofs++] = hex2char(len & 0x0f);   // data length as single ASCII hex char
     pkt[ofs++] = write ? 'w' : 'r';
@@ -253,6 +256,12 @@ void Topotek::send_packet(char addr2, const char id[3], bool write, const uint8_
     const uint8_t crc = crc_sum_of_bytes(pkt, ofs);
     pkt[ofs++] = hex2char((crc >> 4) & 0x0f);
     pkt[ofs++] = hex2char(crc & 0x0f);
+
+    if (_reply_address != connected_interface()) {
+        // the packet is sent out of an interface the autopilot is not
+        // connected to, so it is lost
+        return;
+    }
 
     write_to_autopilot((const char*)pkt, ofs);
 }
