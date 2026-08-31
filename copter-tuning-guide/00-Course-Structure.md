@@ -281,7 +281,7 @@
 | 9. Loiter Mode Tuning | [09-Loiter-Mode-Tuning.md](09-Loiter-Mode-Tuning.md) |
 | 10. Waypoint Navigation Tuning | [10-Waypoint-Navigation-Tuning.md](10-Waypoint-Navigation-Tuning.md) |
 | 11. Tips for Tuning Large Drones | [11-Tips-for-Tuning-Large-Drones.md](11-Tips-for-Tuning-Large-Drones.md) |
-| — | [Παράρτημα Α: Αντιστοίχιση παραμέτρων](A-Αντιστοίχιση-Παραμέτρων.md) |
+| — | [Παράρτημα Α: Αντιστοίχιση παραμέτρων](A-Parameter-Mapping.md) |
 
 > **Σημείωση για το lesson 11.11:** ο τίτλος στο course είναι
 > "ACT_THR_MIX_MAX and ATC_THR_MIX_MAX". Η παράμετρος `ACT_THR_MIX_MAX` **δεν υπάρχει** στον

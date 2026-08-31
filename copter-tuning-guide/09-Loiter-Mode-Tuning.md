@@ -83,7 +83,7 @@ tan(γωνία) = οριζόντια_επιτάχυνση / g
 
 > **Σημείωση έκδοσης:** στην 4.6 και παλιότερα: `PSC_VELXY_*`, `PSC_POSXY_P`, `PSC_JERK_XY`,
 > `LOIT_SPEED` (cm/s), `LOIT_ACC_MAX`, `LOIT_BRK_ACCEL`, `LOIT_BRK_JERK`. Δες το
-> [Παράρτημα Α](A-Αντιστοίχιση-Παραμέτρων.md).
+> [Παράρτημα Α](A-Parameter-Mapping.md).
 
 ---
 
