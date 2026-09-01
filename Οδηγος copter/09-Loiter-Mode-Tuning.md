@@ -14,7 +14,7 @@
 
 ```mermaid
 flowchart TD
-    STK["Stick roll/pitch<br/>= επιθυμητή οριζόντια ταχύτητα"] --> KIN["Kinematic shaping<br/>LOIT_ACC_MAX_M, PSC_JERK_NE"]
+    STK["Stick roll/pitch<br/>= επιθυμητή οριζόντια ταχύτητα"] --> KIN["Kinematic shaping<br/>LOIT_ACC_MAX_M, PSC_NE_JERK"]
     TPOS["Επιθυμητή θέση"] --> POS["Position controller<br/>PSC_NE_POS_P"]
     POS --> VTGT["Target οριζόντια ταχύτητα"]
     KIN --> VTGT
@@ -78,7 +78,7 @@ tan(γωνία) = οριζόντια_επιτάχυνση / g
 
 | Παράμετρος | Default | Ρόλος |
 |---|---|---|
-| `PSC_JERK_NE` | 5.0 m/s³ | Οριζόντιο jerk για το input shaping |
+| `PSC_NE_JERK` | 5.0 m/s³ | Οριζόντιο jerk για το input shaping |
 | `PSC_ANGLE_MAX` | 0 | Όριο γωνίας **μόνο** για τους position controllers. 0 = `ATC_ANGLE_MAX` |
 
 > **Σημείωση έκδοσης:** στην 4.6 και παλιότερα: `PSC_VELXY_*`, `PSC_POSXY_P`, `PSC_JERK_XY`,
@@ -148,7 +148,7 @@ Loiter οφείλεται πιο συχνά σε κακή εκτίμηση θέ�
 ```mermaid
 flowchart TD
     A["Σύγκρινε τις τρεις"] --> B{"Target ≠ Desired;"}
-    B -->|Ναι| C["Kinematic limits σφιχτά<br/>LOIT_ACC_MAX_M, PSC_JERK_NE"]
+    B -->|Ναι| C["Kinematic limits σφιχτά<br/>LOIT_ACC_MAX_M, PSC_NE_JERK"]
     B -->|Όχι| D{"Actual ≠ Target;"}
     D -->|"Στην ταχύτητα"| E["Tuning: PSC_NE_VEL_*"]
     D -->|"Στη θέση"| F["Tuning: PSC_NE_POS_P"]
@@ -234,10 +234,15 @@ flowchart LR
 > **Πρόσεξε:** πολύ μεγάλο `LOIT_BRK_ACC_M` κάνει το drone να "τσιμπάει" απότομα και να
 > χάνει ύψος (γιατί γέρνει πολύ). Πρέπει να ταιριάζει με το `ATC_ANGLE_MAX`.
 
-### `PSC_JERK_NE`
+### `PSC_NE_JERK`
 
 Το πόσο απότομα αλλάζει η επιτάχυνση. Χαμηλότερο = πιο ομαλό, πιο "βαρύ" αίσθημα.
 Default 5.0 m/s³.
+
+> **Και τα κάθετα kinematics;** Το αντίστοιχο `PSC_D_JERK`, μαζί με τα `PILOT_SPD_UP`,
+> `PILOT_SPD_DN` και `PILOT_ACC_Z`, καλύπτονται στο
+> [κεφάλαιο 8 §8.13](08-Altitude-Hold-Mode-Tuning.md). Είναι η ίδια λογική shaping, στον
+> κάθετο άξονα.
 
 ---
 
