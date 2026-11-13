@@ -93,7 +93,7 @@ flowchart LR
 | `PILOT_SPD_UP` | 2.5 | m/s — μέγιστη άνοδος από το stick |
 | `PILOT_SPD_DN` | 0 (= χρησιμοποιεί το `PILOT_SPD_UP`) | m/s |
 | `PILOT_ACC_Z` | 2.5 | m/s² — πόσο απότομα αλλάζει ο climb rate |
-| `PSC_JERK_D` | 5.0 | m/s³ — ρυθμός μεταβολής της επιτάχυνσης |
+| `PSC_D_JERK` | 5.0 | m/s³ — ρυθμός μεταβολής της επιτάχυνσης |
 | `THR_DZ` | — | Deadzone throttle γύρω από το κέντρο |
 
 ---
@@ -165,7 +165,7 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    D["Desired<br/>τι ζητήθηκε"] --> S["Kinematic shaping<br/>PILOT_ACC_Z, PSC_JERK_D"]
+    D["Desired<br/>τι ζητήθηκε"] --> S["Kinematic shaping<br/>PILOT_ACC_Z, PSC_D_JERK"]
     S --> T["Target<br/>τι είναι εφικτό"]
     T --> C["Controller"]
     C --> A["Actual<br/>τι έγινε"]
@@ -338,7 +338,7 @@ gyro).
 | `PILOT_SPD_UP` | 2.5 m/s | Μέγιστη άνοδος |
 | `PILOT_SPD_DN` | 0 (= `PILOT_SPD_UP`) | Μέγιστη κάθοδος |
 | `PILOT_ACC_Z` | 2.5 m/s² | Πόσο απότομα αλλάζει ο climb rate |
-| `PSC_JERK_D` | 5.0 m/s³ | Πόσο απότομα αλλάζει η επιτάχυνση |
+| `PSC_D_JERK` | 5.0 m/s³ | Πόσο απότομα αλλάζει η επιτάχυνση |
 | `THR_DZ` | — | Νεκρή ζώνη γύρω από το μεσαίο throttle |
 
 **Πρακτικά:**

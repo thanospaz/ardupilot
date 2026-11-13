@@ -7,8 +7,15 @@
 > **Ο οδηγός χρησιμοποιεί τα νέα ονόματα.** Αυτός ο πίνακας σε βοηθά αν πετάς 4.6 ή
 > παλιότερα, ή αν διαβάζεις παλιότερα tutorials.
 
-**Καλά νέα:** η μετατροπή γίνεται **αυτόματα** κατά την αναβάθμιση. Δεν χρειάζεται να
-ξανα-εισάγεις τιμές με το χέρι.
+**Καλά νέα:** η μετατροπή γίνεται **αυτόματα** κατά την αναβάθμιση. Σχεδόν πάντα δεν
+χρειάζεται να ξανα-εισάγεις τιμές με το χέρι.
+
+**Οι δύο εξαιρέσεις**, και οι δύο σημειωμένες παρακάτω με ⚠:
+
+- τρεις παράμετροι του κάθετου acceleration controller που η αυτόματη μετατροπή **δεν
+  κλιμακώνει**, ενώ η τεκμηρίωσή τους λέει ότι θα έπρεπε (§Α.1)·
+- παράμετροι που **κράτησαν το όνομά τους αλλά άλλαξαν default** — η αναβάθμιση δεν τις
+  αγγίζει, αλλά μια «καθαρή» εγκατάσταση συμπεριφέρεται διαφορετικά (§Α.9).
 
 ---
 
@@ -32,16 +39,32 @@
 | `PSC_ACCZ_P` | `PSC_D_ACC_P` | **× 0.1** |
 | `PSC_ACCZ_I` | `PSC_D_ACC_I` | **× 0.1** |
 | `PSC_ACCZ_D` | `PSC_D_ACC_D` | **× 0.1** |
-| `PSC_ACCZ_FF` | `PSC_D_ACC_FF` | **× 0.1** |
+| `PSC_ACCZ_FF` | `PSC_D_ACC_FF` | ίδια ⚠ — δες παρακάτω |
 | `PSC_ACCZ_IMAX` | `PSC_D_ACC_IMAX` | **× 0.001** |
 | `PSC_ACCZ_FLTT` | `PSC_D_ACC_FLTT` | ίδια |
 | `PSC_ACCZ_FLTE` | `PSC_D_ACC_FLTE` | ίδια |
 | `PSC_ACCZ_FLTD` | `PSC_D_ACC_FLTD` | ίδια |
 | `PSC_ACCZ_SMAX` | `PSC_D_ACC_SMAX` | ίδια |
-| `PSC_ACCZ_PDMX` | `PSC_D_ACC_PDMX` | **× 0.1** |
-| `PSC_ACCZ_D_FF` | `PSC_D_ACC_D_FF` | **× 0.1** |
+| `PSC_ACCZ_PDMX` | `PSC_D_ACC_PDMX` | ίδια ⚠ — δες παρακάτω |
+| `PSC_ACCZ_D_FF` | `PSC_D_ACC_D_FF` | ίδια ⚠ — δες παρακάτω |
 | `PSC_ACCZ_NTF` / `NEF` | `PSC_D_ACC_NTF` / `NEF` | ίδια |
-| `PSC_JERK_Z` | `PSC_JERK_D` | ίδια (ήδη m/s³) |
+| `PSC_JERK_Z` | `PSC_D_JERK` | ίδια (ήδη m/s³) |
+
+> **⚠ Τρεις παράμετροι που η αυτόματη μετατροπή ΔΕΝ κλιμακώνει — έλεγξέ τις με το χέρι**
+>
+> Οι `PSC_ACCZ_FF`, `PSC_ACCZ_PDMX` και `PSC_ACCZ_D_FF` **μεταφέρονται αυτούσιες**: στο
+> `AC_PosControl::convert_parameters()` βρίσκονται στον πίνακα `conversion_info`, που περνάει
+> από την **ακλιμάκωτη** `AP_Param::convert_old_parameters()`. Μόνο τα `P`, `I`, `D` είναι
+> στον `conversion_info_01` με συντελεστή `0.1`.
+>
+> Η **τεκμηρίωση** όμως των ίδιων παραμέτρων λέει το αντίθετο — π.χ. το `@Description` του
+> `PSC_D_ACC_FF` γράφει *"If upgrading from 4.6 this is _ACCZ_FF * 0.1"*. Είναι δηλαδή
+> **ασυμφωνία μέσα στον ίδιο τον ArduPilot**, όχι δική σου ρύθμιση.
+>
+> **Τι σημαίνει πρακτικά:** αν είχες μη-μηδενική τιμή σε κάποια από τις τρεις στην 4.6, μετά
+> την αναβάθμιση θα βρεθείς με τιμή **10× μεγαλύτερη** από τη σωστή. Διαίρεσέ τη με το 10
+> χειροκίνητα. Στα περισσότερα drones και οι τρεις είναι 0 (default), οπότε δεν σε αφορά —
+> αλλά **έλεγξέ το** πριν πετάξεις.
 
 ### Οριζόντιο επίπεδο
 
@@ -55,7 +78,7 @@
 | `PSC_VELXY_IMAX` | `PSC_NE_VEL_IMAX` | **× 0.01** |
 | `PSC_VELXY_FLTE` | `PSC_NE_VEL_FLTE` | ίδια |
 | `PSC_VELXY_FLTD` | `PSC_NE_VEL_FLTD` | ίδια |
-| `PSC_JERK_XY` | `PSC_JERK_NE` | ίδια (ήδη m/s³) |
+| `PSC_JERK_XY` | `PSC_NE_JERK` | ίδια (ήδη m/s³) |
 | `PSC_ANGLE_MAX` | `PSC_ANGLE_MAX` | αμετάβλητη |
 
 ---
@@ -119,9 +142,10 @@
 | `ATC_ACCEL_P_MAX` (cdeg/s²) | `ATC_ACC_P_MAX` (deg/s²) | **× 0.01** |
 | `ATC_ACCEL_Y_MAX` (cdeg/s²) | `ATC_ACC_Y_MAX` (deg/s²) | **× 0.01** |
 | `ATC_SLEW_YAW` (cdeg/s) | `ATC_RATE_WPY_MAX` (deg/s) | **× 0.01** |
-| `ANGLE_MAX` (παράμετρος Copter) | `ATC_ANGLE_MAX` | μετακινήθηκε στην ομάδα `ATC_` |
+| `ANGLE_MAX` (cdeg, παράμετρος Copter) | `ATC_ANGLE_MAX` (deg) | **× 0.01** — και μετακινήθηκε στην ομάδα `ATC_` |
 
-> **Παράδειγμα:** `ATC_ACCEL_R_MAX = 110000` γίνεται `ATC_ACC_R_MAX = 1100`.
+> **Παραδείγματα:** `ATC_ACCEL_R_MAX = 110000` γίνεται `ATC_ACC_R_MAX = 1100`·
+> `ANGLE_MAX = 4500` γίνεται `ATC_ANGLE_MAX = 45`.
 
 ---
 
@@ -155,7 +179,7 @@
 | `ATC_ANG_*` | `ATC_ANG_RLL_P`, `ATC_ANG_PIT_P`, `ATC_ANG_YAW_P` |
 | `ATC_ACC_*` | `ATC_ACC_R_MAX`, `ATC_ACC_P_MAX`, `ATC_ACC_Y_MAX` |
 | `ATC_THR_MIX_*` | `ATC_THR_MIX_MIN`, `ATC_THR_MIX_MAX`, `ATC_THR_MIX_MAN` |
-| `ATC_INPUT_TC`, `ATC_ANG_LIM_TC` | — |
+| `ATC_INPUT_TC`, `ATC_ANG_LIM_TC` | ίδια ονόματα — αλλά **το default του `ATC_INPUT_TC` άλλαξε** (§Α.9) |
 | `INS_HNTCH_*`, `INS_HNTC2_*` | Όλες οι παράμετροι harmonic notch |
 | `INS_GYRO_FILTER`, `INS_FAST_SAMPLE`, `INS_GYRO_RATE` | — |
 | `INS_LOG_BAT_*` | — |
@@ -184,6 +208,22 @@
 | `WPNAV_RADIUS = 200` | `WP_RADIUS_M = 2.0` |
 
 Για τα κέρδη του κάθετου controller η μετατροπή **δεν είναι ×0.01** — δες τον πίνακα Α.1.
+
+---
+
+## Α.9 Ίδιο όνομα, διαφορετικό default
+
+Αυτές οι παράμετροι **δεν μετονομάστηκαν**, οπότε δεν εμφανίζονται σε κανέναν πίνακα
+μετατροπής — αλλά η εργοστασιακή τους τιμή άλλαξε. Αν αναβαθμίσεις, η δική σου
+αποθηκευμένη τιμή διατηρείται· αν όμως κάνεις reset ή διαβάζεις παλιότερο tutorial, θα δεις
+διαφορά.
+
+| Παράμετρος | Default 4.6 | Default 4.7 / 4.8 | Σχόλιο |
+|---|---|---|---|
+| `ATC_INPUT_TC` | 0.15 (Medium) | **0.10 (Crisp)** | PR 32643. Πιο άμεσο αίσθημα stick. Δες [κεφ. 7 §7.6](07-Stabilisation-Mode-Tuning.md) |
+
+> Το 0.15 εξακολουθεί να είναι το default του **Plane** — γι' αυτό πολλά κείμενα το
+> αναφέρουν ακόμα ως «η εργοστασιακή τιμή».
 
 ---
 
